@@ -2,15 +2,34 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Image from "next/image";
+
+interface CaseData {
+  _id?: string;
+  title?: string;
+  slug?: string;
+  summary?: string;
+  body?: string;
+  psychologyProfile?: string;
+  motiveSummary?: string;
+  behavioralPatterns?: string;
+  status?: "draft" | "published";
+  killerName?: string;
+  motiveCategory?: string;
+  yearOfCrime?: number | string;
+  region?: string;
+  coverImage?: string;
+  tags?: string[];
+}
 
 interface CaseFormProps {
-  initialData?: any;
+  initialData?: CaseData;
   isEdit?: boolean;
 }
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) return null;
 
   return (
@@ -141,8 +160,8 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
 
       router.push("/admin");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
     }
   };
@@ -383,9 +402,9 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
               className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-mono text-sm transition-colors"
             />
             
-            <div className="w-full h-40 border border-[#2a2a2a] bg-[#0a0a0a] overflow-hidden flex items-center justify-center">
+            <div className="w-full h-40 border border-[#2a2a2a] bg-[#0a0a0a] overflow-hidden flex items-center justify-center relative">
               {coverImage ? (
-                <img src={coverImage} alt="Cover Preview" className="w-full h-full object-cover opacity-80" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                <Image src={coverImage} alt="Cover Preview" fill unoptimized className="object-cover opacity-80" onError={(e) => (e.currentTarget.style.display = 'none')} />
               ) : (
                 <div className="text-[#2a2a2a] flex flex-col items-center">
                   <svg className="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
