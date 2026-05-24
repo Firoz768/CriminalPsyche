@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     const tag = searchParams.get("tag") || "";
     
     // Base query
-    const query: any = { status: "published" };
+    const query: Record<string, unknown> = { status: "published" };
 
     if (search) {
       query.$or = [

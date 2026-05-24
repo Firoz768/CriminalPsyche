@@ -36,7 +36,7 @@ export async function PATCH(req: Request) {
     }
 
     return NextResponse.json({ success: true, user: { name: updatedUser.name, email: updatedUser.email } });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API PATCH Settings Error:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }

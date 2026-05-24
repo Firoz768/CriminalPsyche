@@ -29,7 +29,7 @@ export async function GET(req: Request) {
       ]
     };
 
-    let cases = await Case.find(query)
+    const cases = await Case.find(query)
       .select("title slug killerName motiveCategory summary coverImage yearOfCrime region tags")
       .lean();
 

@@ -102,7 +102,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredCases.map((c: any) => (
+            {featuredCases.map((c: { slug: string; coverImage?: string; motiveCategory?: string; title?: string; killerName?: string; summary?: string }) => (
               <div
                 key={c.slug}
                 className="bg-[#1a1a1a] border border-[#2a2a2a] p-8 group hover:border-[#8b0000] transition-all duration-300 hover:shadow-[0_0_20px_rgba(139,0,0,0.15)] flex flex-col h-full cursor-pointer relative overflow-hidden"

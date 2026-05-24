@@ -24,7 +24,7 @@ export default async function TagDetailPage({ params }: { params: { tag: string 
       {/* HEADER */}
       <section className="bg-[#111111] border-b border-[#2a2a2a] py-16 px-6 text-center">
         <h1 className="font-heading text-[#8b0000] text-3xl md:text-[42px] font-bold uppercase tracking-tight mb-4 drop-shadow-md">
-          CASES TAGGED: <span className="text-[#e8e8e8] ml-2">"{decodedTag}"</span>
+          CASES TAGGED: <span className="text-[#e8e8e8] ml-2">&quot;{decodedTag}&quot;</span>
         </h1>
         <p className="font-mono text-[#888888] text-[14px] uppercase tracking-widest mx-auto mb-6">
           {cases.length} {cases.length === 1 ? 'case' : 'cases'} found
@@ -43,7 +43,7 @@ export default async function TagDetailPage({ params }: { params: { tag: string 
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cases.map((c: any) => (
+            {cases.map((c: { _id: { toString: () => string }; [key: string]: unknown }) => (
               <CaseCard key={c._id.toString()} c={c} />
             ))}
           </div>

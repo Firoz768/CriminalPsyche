@@ -60,9 +60,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     revalidateTag("featured");
 
     return NextResponse.json({ case: updatedCase });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API PATCH Case Error:", error);
-    if (error.code === 11000) {
+    const err = error as { code?: number };
+    if (err.code === 11000) {
       return NextResponse.json({ message: "A case with this slug already exists." }, { status: 400 });
     }
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });

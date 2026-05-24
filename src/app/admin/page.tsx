@@ -80,7 +80,14 @@ export default async function AdminDashboard() {
                   <td colSpan={6} className="py-16 text-center text-[#888888] font-body text-[15px]">No cases found in the archive.</td>
                 </tr>
               ) : (
-                recentCases.map((c: any) => (
+                recentCases.map((c: {
+                  _id: { toString: () => string };
+                  title?: string;
+                  killerName?: string;
+                  motiveCategory?: string;
+                  status?: string;
+                  yearOfCrime?: number | string;
+                }) => (
                   <tr key={c._id.toString()} className="border-b border-[#1f1f1f] hover:bg-[#1a1a1a] transition-colors group">
                     <td className="py-4 px-6 font-heading text-[#cccccc] text-[18px] font-semibold group-hover:text-[#e8e8e8] transition-colors">
                       {c.title}

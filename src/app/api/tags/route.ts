@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Case from "@/models/Case";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     await dbConnect();
     

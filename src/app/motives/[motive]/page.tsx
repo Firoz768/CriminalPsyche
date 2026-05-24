@@ -35,7 +35,7 @@ export default async function MotivePage({ params }: { params: { motive: string 
           MOTIVE: <span className="text-[#e8e8e8]">{decodedMotive}</span>
         </h1>
         <p className="font-body text-[#888888] text-[16px] md:text-[18px] max-w-2xl mx-auto mb-10 leading-relaxed relative z-10">
-          "{description}"
+          &quot;{description}&quot;
         </p>
         <div className="w-16 h-[1px] bg-[#8b0000] mx-auto mb-6 relative z-10"></div>
         <p className="font-mono text-[#555555] text-[13px] uppercase tracking-widest mx-auto relative z-10">
@@ -52,7 +52,7 @@ export default async function MotivePage({ params }: { params: { motive: string 
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cases.map((c: any) => (
+            {cases.map((c: { _id: { toString: () => string }; [key: string]: unknown }) => (
               <CaseCard key={c._id.toString()} c={c} />
             ))}
           </div>

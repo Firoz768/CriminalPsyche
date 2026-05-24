@@ -5,7 +5,7 @@ import dbConnect from "@/lib/mongodb";
 import Case from "@/models/Case";
 import { revalidatePath, revalidateTag } from "next/cache";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== "admin") {
@@ -51,9 +51,10 @@ export async function POST(req: Request) {
     revalidateTag("featured");
 
     return NextResponse.json({ case: newCase }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Admin Create Case API Error:", error);
-    if (error.code === 11000) {
+    const err = error as { code?: number };
+    if (err.code === 11000) {
       return NextResponse.json({ message: "A case with this slug already exists." }, { status: 400 });
     }
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
