@@ -145,7 +145,7 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
     };
 
     try {
-      const endpoint = isEdit ? `/api/admin/cases/${initialData._id}` : "/api/admin/cases";
+      const endpoint = isEdit ? `/api/admin/cases/${initialData?._id}` : "/api/admin/cases";
       const method = isEdit ? "PATCH" : "POST";
 
       const res = await fetch(endpoint, {

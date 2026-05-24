@@ -43,7 +43,7 @@ export default async function TagDetailPage({ params }: { params: { tag: string 
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cases.map((c: { _id: { toString: () => string }; [key: string]: unknown }) => (
+            {cases.map((c: { _id: { toString: () => string }; slug?: string; coverImage?: string; title?: string; motiveCategory?: string; killerName?: string; summary?: string; yearOfCrime?: number | string }) => (
               <CaseCard key={c._id.toString()} c={c} />
             ))}
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,8 +17,8 @@ interface SearchResult {
   summary?: string;
 }
 
-function HighlightedText({ text, highlight }: { text: string, highlight: string }) {
-  if (!highlight.trim() || !text) return <>{text}</>;
+function HighlightedText({ text, highlight }: { text?: string, highlight: string }) {
+  if (!highlight.trim() || !text) return <>{text || ""}</>;
   
   const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
   return (
@@ -32,7 +32,7 @@ function HighlightedText({ text, highlight }: { text: string, highlight: string 
   );
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -195,5 +195,17 @@ export default function SearchPage() {
 
       </section>
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center">
+        <div className="text-[#888888] font-body uppercase tracking-widest">Loading Archives...</div>
+      </main>
+    }>
+      <SearchContent />
+    </Suspense>
   );
 }

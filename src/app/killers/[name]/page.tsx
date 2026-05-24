@@ -88,7 +88,7 @@ export default async function KillerProfilePage({ params }: { params: { name: st
                   ACTIVE REGIONS
                 </h3>
                 <div className="font-mono text-[#e8e8e8] text-[13px] uppercase">
-                  {[...new Set(cases.map((c: { region?: string }) => c.region).filter(Boolean))].join(", ") || "UNKNOWN"}
+                  {Array.from(new Set(cases.map((c: { region?: string }) => c.region).filter(Boolean))).join(", ") || "UNKNOWN"}
                 </div>
               </div>
             </div>
@@ -109,7 +109,7 @@ export default async function KillerProfilePage({ params }: { params: { name: st
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cases.map((c: { _id: { toString: () => string }; [key: string]: unknown }) => (
+            {cases.map((c: { _id: { toString: () => string }; slug?: string; coverImage?: string; title?: string; motiveCategory?: string; killerName?: string; summary?: string; yearOfCrime?: number | string }) => (
               <CaseCard key={c._id.toString()} c={c} />
             ))}
           </div>
