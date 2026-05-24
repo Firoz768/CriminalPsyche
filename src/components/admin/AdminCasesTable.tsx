@@ -4,9 +4,18 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+interface CaseRecord {
+  _id: string;
+  title?: string;
+  killerName?: string;
+  motiveCategory?: string;
+  status?: string;
+  yearOfCrime?: number | string;
+}
+
 export default function AdminCasesTable() {
   const router = useRouter();
-  const [cases, setCases] = useState<any[]>([]);
+  const [cases, setCases] = useState<CaseRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [caseToDelete, setCaseToDelete] = useState<string | null>(null);
@@ -89,7 +98,7 @@ export default function AdminCasesTable() {
                 <td colSpan={6} className="py-16 text-center text-[#888888] font-body text-[15px]">No cases found in the archive.</td>
               </tr>
             ) : (
-              cases.map((c: any) => (
+              cases.map((c: CaseRecord) => (
                 <tr key={c._id} className="border-b border-[#1f1f1f] hover:bg-[#1a1a1a] transition-colors group">
                   <td className="py-4 px-6 font-heading text-[#cccccc] text-[18px] font-semibold group-hover:text-[#e8e8e8] transition-colors">
                     {c.title}

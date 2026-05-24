@@ -1,7 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 
-export default function CaseCard({ c }: { c: any }) {
+export default function CaseCard({ c }: { c: {
+  slug?: string;
+  coverImage?: string;
+  title?: string;
+  motiveCategory?: string;
+  killerName?: string;
+  summary?: string;
+  yearOfCrime?: number | string;
+} }) {
   return (
     <div className="group block h-full bg-[#1a1a1a] border border-[#2a2a2a] flex flex-col transition-all duration-300 hover:border-[#8b0000] hover:shadow-[0_0_20px_rgba(139,0,0,0.2)] relative overflow-hidden">
       

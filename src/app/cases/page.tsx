@@ -32,7 +32,7 @@ async function CasesGrid({
   const page = parseInt(pageStr, 10) || 1;
   const limit = 12;
 
-  const query: any = { status: "published" };
+  const query: Record<string, unknown> = { status: "published" };
 
   if (search) {
     query.$or = [
@@ -95,7 +95,7 @@ async function CasesGrid({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {cases.map((c: any) => (
+      {cases.map((c: { _id: { toString: () => string }; [key: string]: unknown }) => (
         <CaseCard key={c._id.toString()} c={c} />
       ))}
     </div>
@@ -128,7 +128,7 @@ export default async function CasesPage({
           CASE FILES
         </h1>
         <p className="font-body text-[#888888] text-[16px] max-w-2xl mx-auto mb-8 px-4">
-          A documented archive of the world's most disturbing criminal minds
+          A documented archive of the world&apos;s most disturbing criminal minds
         </p>
         <div className="w-16 h-[2px] bg-[#8b0000] mx-auto"></div>
       </section>

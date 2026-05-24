@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
 import Case from "@/models/Case";
 import Link from "next/link";
+import Image from "next/image";
 import ReadingProgressBar from "./ReadingProgressBar";
 
 import { Metadata } from "next";
@@ -91,10 +92,12 @@ export default async function CaseSinglePage({
             <div className="relative w-full h-[300px] md:h-[450px] border border-[#2a2a2a] bg-[#111111] overflow-hidden">
               {caseFile.coverImage ? (
                 <>
-                  <img
+                  <Image
                     src={caseFile.coverImage}
-                    alt={caseFile.title}
-                    className="w-full h-full object-cover"
+                    alt={caseFile.title || "Cover image"}
+                    fill
+                    unoptimized
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-[#8b0000]/30 mix-blend-multiply pointer-events-none"></div>
                 </>
@@ -307,18 +310,27 @@ export default async function CaseSinglePage({
                   RELATED CASES
                 </h3>
                 <div className="space-y-4">
-                  {relatedCases.map((rc: any) => (
+                  {relatedCases.map((rc: {
+                    _id: { toString: () => string };
+                    slug: string;
+                    coverImage?: string;
+                    title?: string;
+                    motiveCategory?: string;
+                    killerName?: string;
+                  }) => (
                     <Link
                       href={`/cases/${rc.slug}`}
                       key={rc._id.toString()}
                       className="block bg-[#111111] border border-[#2a2a2a] p-3 hover:border-[#8b0000] transition-all duration-300 group flex items-center gap-4 hover:shadow-[0_0_15px_rgba(139,0,0,0.1)]"
                     >
-                      <div className="w-[56px] h-[72px] bg-[#1a1a1a] border border-[#2a2a2a] flex-shrink-0 overflow-hidden">
+                      <div className="w-[56px] h-[72px] bg-[#1a1a1a] border border-[#2a2a2a] flex-shrink-0 overflow-hidden relative">
                         {rc.coverImage ? (
-                          <img
+                          <Image
                             src={rc.coverImage}
-                            alt={rc.title}
-                            className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
+                            alt={rc.title || "Related case cover"}
+                            fill
+                            unoptimized
+                            className="object-cover opacity-60 group-hover:opacity-100 transition-opacity"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-[#2a2a2a] group-hover:text-[#8b0000] transition-colors">

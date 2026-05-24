@@ -16,7 +16,7 @@ export default async function TagsPage() {
   ]);
 
   // Determine scaling for tag cloud
-  const counts = tagsAggregation.map((t: any) => t.count);
+  const counts = tagsAggregation.map((t: { count: number }) => t.count);
   const maxCount = counts.length > 0 ? Math.max(...counts) : 1;
   const minCount = counts.length > 0 ? Math.min(...counts) : 1;
 
@@ -50,7 +50,7 @@ export default async function TagsPage() {
           </div>
         ) : (
           <div className="flex flex-wrap items-center justify-center gap-4 bg-[#111111] p-12 border border-[#2a2a2a] shadow-xl">
-            {tagsAggregation.map((t: any) => {
+            {tagsAggregation.map((t: { tag: string; count: number }) => {
               const fontSize = getFontSize(t.count);
               return (
                 <Link 
