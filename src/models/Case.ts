@@ -15,9 +15,27 @@ export interface ICase extends Document {
   tags?: string[];
   yearOfCrime?: number;
   region?: string;
+  timelineEvents?: {
+    id: string;
+    date: string;
+    title: string;
+    description: string;
+    type: "murder" | "investigation" | "suspect" | "arrest" | "evidence" | "communication" | "outcome";
+  }[];
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
 }
+
+const TimelineEventSchema = new Schema({
+  id: { type: String },
+  date: { type: String },
+  title: { type: String },
+  description: { type: String },
+  type: {
+    type: String,
+    enum: ["murder", "investigation", "suspect", "arrest", "evidence", "communication", "outcome"],
+  },
+}, { _id: false });
 
 const CaseSchema = new Schema<ICase>(
   {
@@ -38,6 +56,7 @@ const CaseSchema = new Schema<ICase>(
     tags: [{ type: String }],
     yearOfCrime: { type: Number },
     region: { type: String },
+    timelineEvents: [TimelineEventSchema],
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     createdAt: { type: Date, default: Date.now },
   },

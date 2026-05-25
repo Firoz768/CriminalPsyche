@@ -5,6 +5,31 @@ import { useRouter } from "next/navigation";
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from "next/image";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+interface TimelineEvent {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+  type: string;
+}
 
 interface CaseData {
   _id?: string;
@@ -22,6 +47,7 @@ interface CaseData {
   region?: string;
   coverImage?: string;
   tags?: string[];
+  timelineEvents?: TimelineEvent[];
 }
 
 interface CaseFormProps {
@@ -57,6 +83,81 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
   );
 };
 
+function SortableEventItem({ event, onRemove, onChange }: { event: TimelineEvent, onRemove: (id: string) => void, onChange: (id: string, field: keyof TimelineEvent, value: string) => void }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: event.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="bg-[#111111] border border-[#2a2a2a] p-4 rounded-sm mb-4 relative">
+      <div className="absolute top-4 right-4 flex gap-4 items-center">
+        <div {...attributes} {...listeners} className="text-[#555555] cursor-grab hover:text-[#e8e8e8]" title="Drag to reorder">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" /></svg>
+        </div>
+        <button type="button" onClick={() => onRemove(event.id)} className="text-[#8b0000] text-xs font-bold uppercase tracking-widest hover:text-red-400">REMOVE</button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-8 md:mt-2">
+        <div>
+          <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Date</label>
+          <input 
+            type="text" 
+            value={event.date}
+            onChange={(e) => onChange(event.id, 'date', e.target.value)}
+            placeholder="e.g. November 9 1888 or Early 1970s"
+            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-mono text-sm"
+          />
+        </div>
+        <div>
+          <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Event Type</label>
+          <select 
+            value={event.type}
+            onChange={(e) => onChange(event.id, 'type', e.target.value)}
+            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-body text-sm"
+          >
+            <option value="murder" style={{color: '#8b0000'}}>Murder</option>
+            <option value="investigation" style={{color: '#555555'}}>Investigation</option>
+            <option value="suspect" style={{color: '#8b4500'}}>Suspect</option>
+            <option value="arrest" style={{color: '#1a7a1a'}}>Arrest</option>
+            <option value="evidence" style={{color: '#1a3a7a'}}>Evidence</option>
+            <option value="communication" style={{color: '#6a1a7a'}}>Communication</option>
+            <option value="outcome" style={{color: '#888888'}}>Outcome</option>
+          </select>
+        </div>
+      </div>
+      <div className="mb-4">
+        <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Event Title</label>
+        <input 
+          type="text" 
+          value={event.title}
+          onChange={(e) => onChange(event.id, 'title', e.target.value)}
+          placeholder="Short title max 6 words"
+          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-heading text-sm"
+        />
+      </div>
+      <div>
+        <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Description</label>
+        <textarea 
+          value={event.description}
+          onChange={(e) => onChange(event.id, 'description', e.target.value)}
+          placeholder="2-3 sentence description of this event"
+          rows={3}
+          className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-body text-sm resize-y"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -82,6 +183,18 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
   // Tags
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState("");
+
+  // Timeline Events
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>(
+    initialData?.timelineEvents || []
+  );
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -121,6 +234,39 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
+  const handleAddTimelineEvent = () => {
+    setTimelineEvents([
+      ...timelineEvents,
+      {
+        id: crypto.randomUUID(),
+        date: "",
+        title: "",
+        description: "",
+        type: "murder"
+      }
+    ]);
+  };
+
+  const handleRemoveTimelineEvent = (id: string) => {
+    setTimelineEvents(timelineEvents.filter(ev => ev.id !== id));
+  };
+
+  const handleUpdateTimelineEvent = (id: string, field: keyof TimelineEvent, value: string) => {
+    setTimelineEvents(timelineEvents.map(ev => ev.id === id ? { ...ev, [field]: value } : ev));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setTimelineEvents((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   const handleSubmit = async (submitStatus: "draft" | "published") => {
     setLoading(true);
     setError("");
@@ -141,7 +287,8 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
       yearOfCrime: yearOfCrime ? parseInt(yearOfCrime.toString(), 10) : undefined,
       region,
       coverImage,
-      tags
+      tags,
+      timelineEvents
     };
 
     try {
@@ -270,13 +417,60 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
           </div>
         </section>
 
+        {/* TIMELINE EVENTS SECTION */}
+        <section className="pt-8 border-t border-[#2a2a2a]">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <label className="block font-body text-[#8b0000] text-[12px] uppercase tracking-[0.2em] font-bold mb-1">
+                TIMELINE EVENTS
+              </label>
+              <div className="text-[#888888] text-[12px]">Add chronological events for this case</div>
+            </div>
+            {timelineEvents.length > 0 && (
+              <div className="text-[#888888] text-[11px] uppercase">
+                {timelineEvents.length} {timelineEvents.length === 1 ? 'EVENT' : 'EVENTS'} ADDED
+              </div>
+            )}
+          </div>
+          
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext 
+              items={timelineEvents.map(t => t.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-0">
+                {timelineEvents.map(event => (
+                  <SortableEventItem 
+                    key={event.id} 
+                    event={event} 
+                    onRemove={handleRemoveTimelineEvent}
+                    onChange={handleUpdateTimelineEvent}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+
+          <button 
+            type="button" 
+            onClick={handleAddTimelineEvent}
+            className="w-full mt-2 py-4 bg-transparent border border-[#8b0000] text-[#8b0000] font-body text-[12px] uppercase tracking-[0.2em] font-bold hover:bg-[#8b0000]/10 transition-colors"
+          >
+            + ADD TIMELINE EVENT
+          </button>
+        </section>
+
       </div>
 
       {/* RIGHT COLUMN */}
       <div className="w-full lg:w-1/3 space-y-8">
         
         {/* PUBLISH CARD */}
-        <div className="bg-[#111111] border border-[#2a2a2a] p-6 shadow-xl sticky top-6">
+        <div className="bg-[#111111] border border-[#2a2a2a] p-6 shadow-xl sticky top-6 z-20">
           <div className="flex items-center justify-between mb-8">
             <span className="font-body text-[#888888] text-[12px] uppercase tracking-wide">Status</span>
             <div className="flex items-center gap-3">
@@ -313,7 +507,7 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
         </div>
 
         {/* CASE DETAILS CARD */}
-        <div className="bg-[#111111] border border-[#2a2a2a] p-6 shadow-xl">
+        <div className="bg-[#111111] border border-[#2a2a2a] p-6 shadow-xl relative z-10">
           <h3 className="font-body text-[#8b0000] text-sm uppercase tracking-[0.2em] font-bold mb-6">Details</h3>
           
           <div className="space-y-5">
@@ -390,7 +584,7 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
         </div>
 
         {/* COVER IMAGE CARD */}
-        <div className="bg-[#111111] border border-[#2a2a2a] p-6 shadow-xl">
+        <div className="bg-[#111111] border border-[#2a2a2a] p-6 shadow-xl relative z-10">
           <h3 className="font-body text-[#8b0000] text-sm uppercase tracking-[0.2em] font-bold mb-6">Cover Image</h3>
           
           <div className="space-y-4">
