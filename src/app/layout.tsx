@@ -5,6 +5,8 @@ import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import InitialLoader from "@/components/InitialLoader";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ 
   subsets: ["latin"], 
@@ -41,6 +43,8 @@ export default function RootLayout({
               {children}
             </div>
             <Footer />
+            <Analytics />
+            <SpeedInsights />
           </div>
         </AuthProvider>
       </body>

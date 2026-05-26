@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ReadingProgressBar from "./ReadingProgressBar";
+import CaseComments from "./CaseComments";
 
 interface CaseClientProps {
   caseFile: any;
@@ -201,15 +202,14 @@ export default function CaseClient({
                 <h2 className="font-heading text-[#e8e8e8] text-[24px] mb-6">
                   The Case File
                 </h2>
-                <div
-                  className="font-body text-[#cccccc] text-[16px] leading-[1.9] prose prose-invert prose-p:mb-6 prose-a:text-[#8b0000] prose-a:no-underline hover:prose-a:underline max-w-none"
-                  dangerouslySetInnerHTML={{
+                <div className="prose prose-invert max-w-none prose-custom">
+                  <div dangerouslySetInnerHTML={{
                     __html:
                       caseFile.body ||
                       caseFile.summary ||
                       "<p>Body data missing or fully redacted.</p>",
-                  }}
-                ></div>
+                  }} />
+                </div>
               </section>
 
               <div className="w-full h-[1px] bg-[#2a2a2a]"></div>
@@ -231,7 +231,7 @@ export default function CaseClient({
                     </div>
                   </div>
                 ) : (
-                  <div className={`font-body text-[#cccccc] text-[16px] leading-[1.9] whitespace-pre-wrap ${isAnimating ? "opacity-0" : "animate-text-fade-in"}`}>
+                  <div className={`prose prose-invert max-w-none prose-custom whitespace-pre-wrap ${isAnimating ? "opacity-0" : "animate-text-fade-in"}`}>
                     {caseFile.psychologyProfile ||
                       "Psychological analysis is currently incomplete or pending review from behavioral science unit."}
                   </div>
@@ -248,7 +248,7 @@ export default function CaseClient({
                 <h2 className="font-heading text-[#e8e8e8] text-[24px] mb-6 capitalize">
                   {caseFile.motiveCategory || "Unknown"} Drive
                 </h2>
-                <div className="font-body text-[#cccccc] text-[16px] leading-[1.9] whitespace-pre-wrap">
+                <div className="prose prose-invert max-w-none prose-custom whitespace-pre-wrap">
                   {caseFile.motiveSummary ||
                     `Analysis indicates the primary operational driver was ${
                       caseFile.motiveCategory || "unknown factors"
@@ -275,7 +275,7 @@ export default function CaseClient({
                     </div>
                   </div>
                 ) : (
-                  <div className={`font-body text-[#cccccc] text-[16px] leading-[1.9] whitespace-pre-wrap ${isAnimating ? "opacity-0" : "animate-text-fade-in"}`}>
+                  <div className={`prose prose-invert max-w-none prose-custom whitespace-pre-wrap ${isAnimating ? "opacity-0" : "animate-text-fade-in"}`}>
                     {caseFile.behavioralPatterns ||
                       "No clear behavioral patterns have been established at this time."}
                   </div>
@@ -345,6 +345,7 @@ export default function CaseClient({
                   </section>
                 </>
               )}
+              <CaseComments slug={slug} />
             </article>
           </div>
 
@@ -461,6 +462,16 @@ export default function CaseClient({
                   </div>
                 )}
               </div>
+
+              {/* EVIDENCE BOARD LINK */}
+              {caseFile.evidenceItems && caseFile.evidenceItems.length > 0 && (
+                <Link
+                  href={`/cases/${slug}/evidence`}
+                  className="block w-full bg-[#111111] border border-[#8b0000] text-[#8b0000] hover:bg-[#8b0000] hover:text-white transition-colors font-body text-[12px] font-bold uppercase tracking-widest text-center py-4 shadow-[0_0_15px_rgba(139,0,0,0.1)] hover:shadow-[0_0_20px_rgba(139,0,0,0.3)]"
+                >
+                  VIEW EVIDENCE BOARD →
+                </Link>
+              )}
 
               {/* RELATED CASES */}
               {relatedCases.length > 0 && (

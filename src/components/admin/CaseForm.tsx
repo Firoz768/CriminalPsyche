@@ -31,6 +31,17 @@ interface TimelineEvent {
   type: string;
 }
 
+interface EvidenceItem {
+  id: string;
+  title: string;
+  description?: string;
+  type: string;
+  imageUrl?: string;
+  x: number;
+  y: number;
+  connections: number[];
+}
+
 interface CaseData {
   _id?: string;
   title?: string;
@@ -48,6 +59,7 @@ interface CaseData {
   coverImage?: string;
   tags?: string[];
   timelineEvents?: TimelineEvent[];
+  evidenceItems?: EvidenceItem[];
 }
 
 interface CaseFormProps {
@@ -189,6 +201,11 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
     initialData?.timelineEvents || []
   );
 
+  // Evidence Items
+  const [evidenceItems, setEvidenceItems] = useState<EvidenceItem[]>(
+    initialData?.evidenceItems || []
+  );
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -255,6 +272,30 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
     setTimelineEvents(timelineEvents.map(ev => ev.id === id ? { ...ev, [field]: value } : ev));
   };
 
+  const handleAddEvidenceItem = () => {
+    setEvidenceItems([
+      ...evidenceItems,
+      {
+        id: crypto.randomUUID(),
+        title: "",
+        description: "",
+        type: "note",
+        imageUrl: "",
+        x: 50,
+        y: 50,
+        connections: []
+      }
+    ]);
+  };
+
+  const handleRemoveEvidenceItem = (id: string) => {
+    setEvidenceItems(evidenceItems.filter(ev => ev.id !== id));
+  };
+
+  const handleUpdateEvidenceItem = (id: string, field: keyof EvidenceItem, value: any) => {
+    setEvidenceItems(evidenceItems.map(ev => ev.id === id ? { ...ev, [field]: value } : ev));
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -288,7 +329,8 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
       region,
       coverImage,
       tags,
-      timelineEvents
+      timelineEvents,
+      evidenceItems
     };
 
     try {
@@ -461,6 +503,128 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
             className="w-full mt-2 py-4 bg-transparent border border-[#8b0000] text-[#8b0000] font-body text-[12px] uppercase tracking-[0.2em] font-bold hover:bg-[#8b0000]/10 transition-colors"
           >
             + ADD TIMELINE EVENT
+          </button>
+        </section>
+
+        {/* EVIDENCE BOARD SECTION */}
+        <section className="pt-8 border-t border-[#2a2a2a]">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <label className="block font-body text-[#8b0000] text-[12px] uppercase tracking-[0.2em] font-bold mb-1">
+                EVIDENCE BOARD
+              </label>
+              <div className="text-[#888888] text-[12px]">Add evidence items that appear on the case evidence board</div>
+            </div>
+            {evidenceItems.length > 0 && (
+              <div className="text-[#888888] text-[11px] uppercase">
+                {evidenceItems.length} {evidenceItems.length === 1 ? 'ITEM' : 'ITEMS'} ADDED
+              </div>
+            )}
+          </div>
+          
+          <div className="space-y-4">
+            {evidenceItems.map((item, index) => (
+              <div key={item.id} className="bg-[#111111] border border-[#2a2a2a] p-4 rounded-sm relative">
+                <div className="absolute top-4 right-4 flex gap-4 items-center">
+                  <span className="text-[#555555] text-xs font-mono">#{index}</span>
+                  <button type="button" onClick={() => handleRemoveEvidenceItem(item.id)} className="text-[#8b0000] text-xs font-bold uppercase tracking-widest hover:text-red-400">REMOVE</button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-8 md:mt-2">
+                  <div>
+                    <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Title</label>
+                    <input 
+                      type="text" 
+                      value={item.title}
+                      onChange={(e) => handleUpdateEvidenceItem(item.id, 'title', e.target.value)}
+                      placeholder="e.g. Victim photograph"
+                      className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-mono text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Type</label>
+                    <select 
+                      value={item.type}
+                      onChange={(e) => handleUpdateEvidenceItem(item.id, 'type', e.target.value)}
+                      className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-body text-sm"
+                    >
+                      <option value="photo" style={{color: '#8b0000'}}>Photo</option>
+                      <option value="document" style={{color: '#1a3a7a'}}>Document</option>
+                      <option value="weapon" style={{color: '#8b4500'}}>Weapon</option>
+                      <option value="note" style={{color: '#6a5a00'}}>Note</option>
+                      <option value="map" style={{color: '#1a5a1a'}}>Map</option>
+                      <option value="profile" style={{color: '#6a1a7a'}}>Profile</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Image URL</label>
+                  <input 
+                    type="text" 
+                    value={item.imageUrl || ""}
+                    onChange={(e) => handleUpdateEvidenceItem(item.id, 'imageUrl', e.target.value)}
+                    placeholder="https://..."
+                    className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-mono text-sm"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Description</label>
+                  <textarea 
+                    value={item.description || ""}
+                    onChange={(e) => handleUpdateEvidenceItem(item.id, 'description', e.target.value)}
+                    rows={2}
+                    className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-body text-sm resize-y"
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Position X</label>
+                    <input 
+                      type="number" 
+                      min="0" max="100"
+                      value={item.x}
+                      onChange={(e) => handleUpdateEvidenceItem(item.id, 'x', Number(e.target.value))}
+                      placeholder="50"
+                      className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-mono text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Position Y</label>
+                    <input 
+                      type="number" 
+                      min="0" max="100"
+                      value={item.y}
+                      onChange={(e) => handleUpdateEvidenceItem(item.id, 'y', Number(e.target.value))}
+                      placeholder="50"
+                      className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-mono text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-body text-[#888888] text-[10px] uppercase tracking-wide mb-1">Connections</label>
+                    <input 
+                      type="text" 
+                      value={item.connections?.join(', ') || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const arr = val.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+                        handleUpdateEvidenceItem(item.id, 'connections', arr);
+                      }}
+                      placeholder="e.g. 0, 2"
+                      className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-[#e8e8e8] placeholder:text-[#555555] focus:outline-none focus:border-[#8b0000] px-3 py-2 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="mt-2 text-[#555555] text-[11px] font-body">X and Y are percentage positions on the board (0-100). Connections are index numbers of other items.</div>
+              </div>
+            ))}
+          </div>
+
+          <button 
+            type="button" 
+            onClick={handleAddEvidenceItem}
+            className="w-full mt-4 py-4 bg-transparent border border-[#8b0000] text-[#8b0000] font-body text-[12px] uppercase tracking-[0.2em] font-bold hover:bg-[#8b0000]/10 transition-colors"
+          >
+            + ADD EVIDENCE ITEM
           </button>
         </section>
 

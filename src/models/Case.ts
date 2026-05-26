@@ -22,6 +22,16 @@ export interface ICase extends Document {
     description: string;
     type: "murder" | "investigation" | "suspect" | "arrest" | "evidence" | "communication" | "outcome";
   }[];
+  evidenceItems?: {
+    id: string;
+    title: string;
+    description?: string;
+    type: "photo" | "document" | "weapon" | "note" | "map" | "profile";
+    imageUrl?: string;
+    x: number;
+    y: number;
+    connections: number[];
+  }[];
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
 }
@@ -35,6 +45,21 @@ const TimelineEventSchema = new Schema({
     type: String,
     enum: ["murder", "investigation", "suspect", "arrest", "evidence", "communication", "outcome"],
   },
+}, { _id: false });
+
+const EvidenceItemSchema = new Schema({
+  id: { type: String, required: true },
+  title: { type: String, required: true },
+  description: { type: String },
+  type: {
+    type: String,
+    enum: ["photo", "document", "weapon", "note", "map", "profile"],
+    default: "note"
+  },
+  imageUrl: { type: String },
+  x: { type: Number, default: 50 },
+  y: { type: Number, default: 50 },
+  connections: [{ type: Number }]
 }, { _id: false });
 
 const CaseSchema = new Schema<ICase>(
@@ -57,6 +82,7 @@ const CaseSchema = new Schema<ICase>(
     yearOfCrime: { type: Number },
     region: { type: String },
     timelineEvents: [TimelineEventSchema],
+    evidenceItems: [EvidenceItemSchema],
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     createdAt: { type: Date, default: Date.now },
   },

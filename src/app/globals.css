@@ -36,3 +36,62 @@ body::after {
     text-wrap: balance;
   }
 }
+
+.prose-custom p {
+  margin-bottom: 1.5rem;
+  line-height: 1.9;
+  color: #cccccc;
+  font-size: 16px;
+  font-weight: 400 !important;
+  font-style: normal !important;
+}
+.prose-custom h1, .prose-custom h2, .prose-custom h3 {
+  font-family: 'Playfair Display', serif;
+  color: #e8e8e8;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+.prose-custom h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #2a2a2a;
+  padding-bottom: 8px;
+}
+.prose-custom h3 {
+  font-size: 20px;
+  color: #8b0000;
+}
+.prose-custom strong {
+  color: #e8e8e8;
+  font-weight: 600;
+}
+.prose-custom em {
+  color: #cccccc;
+  font-style: italic;
+}
+.prose-custom blockquote {
+  border-left: 3px solid #8b0000;
+  padding-left: 1.5rem;
+  color: #888888;
+  font-style: italic;
+  margin: 2rem 0;
+}
+.prose-custom ul, .prose-custom ol {
+  color: #cccccc;
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+.prose-custom li {
+  margin-bottom: 0.5rem;
+  line-height: 1.8;
+}
+.prose-custom ul li::marker {
+  color: #8b0000;
+}
+.prose-custom ol li::marker {
+  color: #8b0000;
+}
+.prose-custom hr {
+  border-color: #2a2a2a;
+  margin: 2.5rem 0;
+}
