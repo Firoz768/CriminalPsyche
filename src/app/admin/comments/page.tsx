@@ -2,10 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { formatRelativeTime } from "@/lib/utils"; // We'll create this utility
+
+interface CommentType {
+  _id: string;
+  body: string;
+  userName: string;
+  createdAt: string;
+  caseId?: { slug: string; title: string; };
+}
 
 export default function AdminCommentsPage() {
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

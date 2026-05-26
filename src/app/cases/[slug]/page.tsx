@@ -67,7 +67,7 @@ export default async function CaseSinglePage({
 
   // We serialize the MongoDB documents before passing to client components
   // since .lean() returns plain objects, it should be fine, but we need to convert _id to string
-  const serializeMongoData = (doc: any) => {
+  const serializeMongoData = (doc: unknown) => {
     return JSON.parse(JSON.stringify(doc));
   };
 

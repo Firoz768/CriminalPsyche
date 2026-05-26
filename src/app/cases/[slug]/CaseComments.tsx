@@ -26,23 +26,22 @@ export default function CaseComments({ slug }: { slug: string }) {
   const COMMENTS_PER_PAGE = 10;
 
   useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/cases/${slug}/comments`);
+        if (res.ok) {
+          const data = await res.json();
+          setComments(data.comments);
+          setTotalCount(data.comments.length);
+        }
+      } catch (error) {
+        console.error("Failed to fetch comments", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchComments();
   }, [slug]);
-
-  const fetchComments = async () => {
-    try {
-      const res = await fetch(`/api/cases/${slug}/comments`);
-      if (res.ok) {
-        const data = await res.json();
-        setComments(data.comments);
-        setTotalCount(data.comments.length);
-      }
-    } catch (error) {
-      console.error("Failed to fetch comments", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handlePostComment = async (e: React.FormEvent) => {
     e.preventDefault();

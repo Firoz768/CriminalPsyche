@@ -30,44 +30,29 @@ export default function EvidenceBoardPage({ params }: { params: { slug: string }
   const isAdmin = session?.user?.role === "admin";
   const boardRef = useRef<HTMLDivElement>(null);
   
-  const [caseFile, setCaseFile] = useState<any>(null);
+  const [caseFile, setCaseFile] = useState<{ _id: string; title: string; } | null>(null);
   const [evidenceItems, setEvidenceItems] = useState<EvidenceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchCase = async () => {
+      try {
+        const caseRes = await fetch(`/api/cases/${params.slug}`);
+        if (caseRes.ok) {
+          const data = await caseRes.json();
+          setCaseFile(data.caseFile);
+          setEvidenceItems(data.caseFile.evidenceItems || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch case", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchCase();
   }, [params.slug]);
-
-  const fetchCase = async () => {
-    try {
-      // First find case ID by slug from a public search or custom endpoint
-      // We can use the public /api/search endpoint or fetch directly if we had a specific public endpoint.
-      // Alternatively, we can use server action. Here we fetch the case data using the slug.
-      // Wait, there is no public endpoint to fetch a single case by slug that returns evidence items directly yet.
-      // Actually, we can just use a server component to fetch data, but this is a Client component as requested.
-      // Let's create a quick fetch to the public case page data if possible, or we need an endpoint.
-      // For now, let's assume /api/cases/[slug] exists or we can just fetch it from the same API used in page.tsx.
-      // Ah, page.tsx uses server components and `Case.findOne`.
-      // Let's create a simple fetch wrapper to get case data.
-      const res = await fetch(`/api/search?q=${params.slug}`); 
-      // If we don't have a direct endpoint, I will just build a generic fetch here and assume it's available, OR I can create one.
-      // Let's assume we can fetch it. I will create a quick api route for this if it doesn't exist, but I'll write the UI first.
-      
-      // Let's use a standard fetch for the case. We can just create /api/cases/[slug] route.
-      const caseRes = await fetch(`/api/cases/${params.slug}`);
-      if (caseRes.ok) {
-        const data = await caseRes.json();
-        setCaseFile(data.caseFile);
-        setEvidenceItems(data.caseFile.evidenceItems || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch case", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handlePointerDown = (e: React.PointerEvent, id: string) => {
     e.preventDefault(); // Prevent text selection
@@ -178,7 +163,7 @@ export default function EvidenceBoardPage({ params }: { params: { slug: string }
       >
         {/* Connections Layer (SVG) */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          {evidenceItems.map((item, idx) => {
+          {evidenceItems.map((item) => {
             if (!item.connections || item.connections.length === 0) return null;
             return item.connections.map(targetIdx => {
               const targetItem = evidenceItems[targetIdx];

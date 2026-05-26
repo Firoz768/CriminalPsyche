@@ -292,7 +292,7 @@ export default function CaseForm({ initialData, isEdit }: CaseFormProps) {
     setEvidenceItems(evidenceItems.filter(ev => ev.id !== id));
   };
 
-  const handleUpdateEvidenceItem = (id: string, field: keyof EvidenceItem, value: any) => {
+  const handleUpdateEvidenceItem = (id: string, field: keyof EvidenceItem, value: EvidenceItem[keyof EvidenceItem]) => {
     setEvidenceItems(evidenceItems.map(ev => ev.id === id ? { ...ev, [field]: value } : ev));
   };
 

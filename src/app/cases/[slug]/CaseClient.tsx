@@ -7,8 +7,22 @@ import ReadingProgressBar from "./ReadingProgressBar";
 import CaseComments from "./CaseComments";
 
 interface CaseClientProps {
-  caseFile: any;
-  relatedCases: any[];
+  caseFile: Record<string, unknown> & {
+    title?: string;
+    killerName?: string;
+    motiveCategory?: string;
+    coverImage?: string;
+    body?: string;
+    summary?: string;
+    psychologyProfile?: string;
+    motiveSummary?: string;
+    behavioralPatterns?: string;
+    yearOfCrime?: string | number;
+    region?: string;
+    timelineEvents?: Array<Record<string, unknown> & { id: string; date: string; title: string; description: string; type: string }>;
+    evidenceItems?: Array<Record<string, unknown>>;
+  };
+  relatedCases: Array<Record<string, unknown> & { _id: { toString: () => string }; slug: string; motiveCategory: string; title: string; killerName: string; coverImage: string; }>;
   tags: string[];
   isUnsolved: boolean;
   isAdmin: boolean;
@@ -25,7 +39,7 @@ const typeColors: Record<string, string> = {
   outcome: '#555555'
 };
 
-const TimelineCard = ({ event, dotColor }: { event: any, dotColor: string }) => (
+const TimelineCard = ({ event, dotColor }: { event: Record<string, unknown> & { date: string; title: string; description: string; type?: string; }, dotColor: string }) => (
   <div className="bg-[#1a1a1a] border border-[#2a2a2a] p-5 rounded-sm relative w-full">
     <div className="font-body text-[11px] uppercase tracking-wide mb-2" style={{ color: dotColor }}>
       {event.date}
@@ -62,7 +76,7 @@ export default function CaseClient({
   }, [isAdmin, slug]);
 
   const playClickSound = () => {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    const AudioContext = window.AudioContext || (window as unknown as { webkitAudioContext: typeof window.AudioContext }).webkitAudioContext;
     if (!AudioContext) return;
     const ctx = new AudioContext();
     const osc = ctx.createOscillator();
@@ -298,7 +312,7 @@ export default function CaseClient({
                       <div className="absolute left-[8px] md:left-1/2 top-0 bottom-0 w-[2px] bg-[#8b0000] -translate-x-1/2 md:-translate-x-1/2"></div>
                       
                       <div className="space-y-8">
-                        {caseFile.timelineEvents.map((event: any, index: number) => {
+                        {caseFile.timelineEvents.map((event: Record<string, unknown> & { id: string; date: string; title: string; description: string; type: string }, index: number) => {
                           const isEven = index % 2 === 0;
                           const dotColor = typeColors[event.type] || '#555555';
                           
@@ -481,7 +495,7 @@ export default function CaseClient({
                     RELATED CASES
                   </h3>
                   <div className="space-y-4">
-                    {relatedCases.map((rc: any) => (
+                    {relatedCases.map((rc: Record<string, unknown> & { _id: { toString: () => string }; slug: string; motiveCategory: string; title: string; killerName: string; coverImage: string; }) => (
                       <Link
                         href={`/cases/${rc.slug}`}
                         key={rc._id.toString()}
